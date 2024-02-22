@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSM ARENA</title>
+</head>
+<body>
+    <h1>GSM ARENA</h1>
+
+
+    <script src="jquery.js"></script>
+    <script>
+        console.log("gsm arena")
+
+        var arr = ['ayo', 'tunde', 'wale', 'kunle', 'mubarak']
+        fetch(
+            'loader.php',{
+            method: 'GET'
+        }).then(response => response.json()).then(data => {
+            const brands = data 
+            let index = 0
+
+            var intVal = setInterval(function(){
+                console.log(index+1,data[index].name)
+                index++
+
+                for (let a = 0; a < arr.length; a++) {
+                    delay
+                    console.log(arr[a])
+                }
+
+                if(index == data.length){
+                    clearInterval(intVal)
+                }
+            }, 1000)
+
+        })
+            
+    </script>
+</body>
+</html>

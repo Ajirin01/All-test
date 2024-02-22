@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run game</title>
+
+    <style>
+        .game-container{
+            width: 100%;
+            height: 500px;
+            background-color: green;
+        }
+
+        .line{
+            width: 100%;
+            height: 200px;
+            border-bottom: black solid 10px
+        }
+
+        .A{
+            position: relative;
+            height: 10px;
+            width: 10px;
+            background-color: red;
+            top: 190px;
+            left: 0;
+            transition: left top;
+            transition-duration: .1s;
+        }
+
+        .B{
+            position: relative;
+            height: 30px;
+            width: 10px;
+            background-color: rgb(0, 102, 255);
+            top: 160px;
+            left: 200px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="game-container">
+        <h1>Game Container</h1>
+
+        <div class="line">
+            <div class="A" id="A"></div>
+            <div class="B" id="B"></div>
+        </div>
+        <br><br><br><br>
+
+        <div class="control">
+            <button id="jump">jump</button>
+        </div>
+    </div>
+
+    <script>
+        console.log('hello')
+        const A = document.getElementById('A')
+        const B = document.getElementById('B')
+
+        var rectA
+        var rectB
+        const jump = document.getElementById('jump')
+
+        var a_x = 0
+        var a_btm = 190
+
+        console.log(a_btm)
+
+        const b_height = 30
+        var b_x = 200
+        var b_btm = 160 + b_height
+
+        var count = 0
+        const interval = setInterval(function(){
+            count++
+            console.log('a_x: ' + a_x, 'b_x: '+ b_x)
+            console.log(a_btm == 180)
+            a_x = Number(a_x) + 2
+            A.style.left = a_x + 'px'
+
+            b_x = Number(b_x) - 2
+            B.style.left = b_x + 'px'
+
+            rectA = A.getBoundingClientRect()
+            console.log(rectA)
+
+            rectB = B.getBoundingClientRect()
+            console.log(rectB)
+
+            console.log(rectA == rectB)
+
+            jump.onmousedown = function(event){
+                // a_x = Number(a_x) + 20
+                // A.style.left = a_x + 'px'
+
+                a_btm = 150
+                A.style.top = a_btm + 'px'
+                console.log(A.style.top )
+            }
+
+            jump.onmouseup = function(event){
+                // a_x = Number(a_x) + 20
+                // A.style.left = a_x + 'px'
+
+                a_btm = 180
+                // for(let i = 0; i < 20; i = i + 5 ){
+                //     a_btm =  i + a_btm
+                // }
+                
+                A.style.top = a_btm + 10 + 'px'
+            }
+            // a_btm <= b_height &&
+            // if(count == 50){
+            //     console.log("game over")
+            //     collide()
+            // }
+            if((a_btm >= (b_btm - b_height)) && (a_x == b_x)){
+                console.log("game over")
+                collide()
+            }
+
+
+        }, 100)
+
+        function collide(){
+            console.log("collided")
+            clearInterval(interval)
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Project Management App</title>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+	<!-- Compiled and minified JavaScript -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+
+
+	<style>
+		ul li{
+			list-style-type: disc !important;
+			margin-left: 20px
+		}
+
+		.toggle-button {
+			margin-right: 5px;
+		}
+
+		.expandable {
+			display: none;
+		}
+
+		.expanded {
+			display: block;
+		}
+
+		.dropdown-content li{
+			list-style-type: none !important;
+		}
+	</style>
+</head>
+<body ng-app="myApp" ng-controller="cont">
+	<h1>{{name}}</h1>
+
+	<!-- Modal Trigger -->
+	<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Add Project</a>
+
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Title</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr ng-repeat="project in projects">
+				<td>{{project.id}}</td>
+				<td>
+					<!-- Dropdown trigger -->
+					<h4>
+						<button class="toggle-button" ng-if="hasSubTasks(project)" ng-click="toggleHierarchy(project)">
+							{{project.showHierarchy ? '-' : '+'}}
+						</button>
+
+						{{project.title}} <span class='dropdown-trigger' href='#' data-target='dropdown{{project.id}}'><i class="material-icons">more_vert</i></span>
+					</h4>
+					
+					<!-- Dropdown Structure -->
+					<ul id='dropdown{{project.id}}' class='dropdown-content'>
+						<li><a class="waves-effect waves-light modal-trigger" href="#addSubTaskModel{{project.id}}" ng-click="addSubTask()">Add Subtask</a></li>
+						<li><a href="#!">Edit task</a></li>
+						<li><a href="#!">Delete</a></li>
+						<li><a href="#!">close</a></li>
+					</ul>
+
+					<!-- Add subTask Model -->
+					<div id="addSubTaskModel{{project.id}}" class="modal">
+						<div class="modal-content">
+						<h4>Add SubTask</h4>
+						<form ng-submit="editingTask ? updateSubtask(project.id) : createSubtask(project.id)">
+							<label for="projectTitle">Task Title:</label>
+							<input type="text" id="projectTitle" ng-model="taskForm.title" placeholder="Enter project title">
+					
+							<label for="projectStatus">Task Status:</label>
+							<input type="text" id="projectStatus" ng-model="taskForm.status" placeholder="Enter project status">
+					
+							<button class="btn btn-wave" type="submit" ng-if="!editingTask">Create</button>
+							<button class="btn btn-wave" type="submit" ng-if="editingTask">Update</button>
+							<button class="btn btn-danger" type="button" ng-click="resetSubtaskForm()">Cancel</button>
+						</form>
+						</div>
+						<div class="modal-footer">
+						<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+						</div>
+					</div>
+					
+					<ul  class="expandable" ng-class="{ 'expanded': project.showHierarchy && hasSubTasks(project) }">
+						<li ng-repeat="subTask in project.subTask">
+							<button class="toggle-button" ng-if="hasSubTasks(subTask)" ng-click="toggleHierarchy(subTask)">
+								{{subTask.showHierarchy ? '-' : '+'}}
+							</button>
+							{{subTask.title}}
+							<span class='dropdown-trigger' href='#' data-target='dropdown{{subTask.id}}'><i class="material-icons">more_vert</i></span>
+							<!-- Dropdown Structure -->
+							<ul id='dropdown{{subTask.id}}' class='dropdown-content'>
+								<li><a class="waves-effect waves-light modal-trigger" href="#addSubTaskModel{{subTask.id}}" ng-click="addSubTask()">Add Subtask</a></li>
+								<li><a href="#!">Edit task</a></li>
+								<li><a href="#!">Delete</a></li>
+								<li><a href="#!">close</a></li>
+							</ul>
+
+							<!-- Add subTask Model -->
+							<div id="addSubTaskModel{{subTask.id}}" class="modal">
+								<div class="modal-content">
+								<h4>Add SubTask</h4>
+								<form ng-submit="editingTask ? updateSubtask(subTask.id) : createSubtask(subTask.id)">
+									<label for="projectTitle">Task Title:</label>
+									<input type="text" id="projectTitle" ng-model="taskForm.title" placeholder="Enter subTask title">
+							
+									<label for="projectStatus">Task Status:</label>
+									<input type="text" id="projectStatus" ng-model="taskForm.status" placeholder="Enter subTask status">
+							
+									<button class="btn btn-wave" type="submit" ng-if="!editingTask">Create</button>
+									<button class="btn btn-wave" type="submit" ng-if="editingTask">Update</button>
+									<button class="btn btn-danger" type="button" ng-click="resetSubtaskForm()">Cancel</button>
+								</form>
+								</div>
+								<div class="modal-footer">
+								<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+								</div>
+							</div>
+
+							<ul  class="expandable" ng-class="{ 'expanded': subTask.showHierarchy && hasSubTasks(subTask) }">
+								<li ng-repeat="nestedSubTask in subTask.subTask">
+									<button class="toggle-button" ng-if="hasSubTasks(nestedSubTask)" ng-click="toggleHierarchy(nestedSubTask)">
+										{{nestedSubTask.showHierarchy ? '-' : '+'}}
+									</button>
+									{{nestedSubTask.title}}
+									
+									<span class='dropdown-trigger' href='#' data-target='dropdown{{nestedSubTask.id}}'><i class="material-icons">more_vert</i></span>
+									
+									<!-- Dropdown Structure -->
+									<ul id='dropdown{{nestedSubTask.id}}' class='dropdown-content'>
+										<li><a class="waves-effect waves-light modal-trigger" href="#addSubTaskModel{{nestedSubTask.id}}" ng-click="addSubTask()">Add Subtask</a></li>
+										<li><a href="#!">Edit task</a></li>
+										<li><a href="#!">Delete</a></li>
+										<li><a href="#!">close</a></li>
+									</ul>
+
+									<!-- Add subTask Model -->
+									<div id="addSubTaskModel{{nestedSubTask.id}}" class="modal">
+										<div class="modal-content">
+										<h4>Add SubTask</h4>
+										<form ng-submit="editingTask ? updateSubtask(nestedSubTask.id) : createSubtask(nestedSubTask.id)">
+											<label for="projectTitle">Task Title:</label>
+											<input type="text" id="projectTitle" ng-model="taskForm.title" placeholder="Enter subTask title">
+									
+											<label for="projectStatus">Task Status:</label>
+											<input type="text" id="projectStatus" ng-model="taskForm.status" placeholder="Enter subTask status">
+									
+											<button class="btn btn-wave" type="submit" ng-if="!editingTask">Create</button>
+											<button class="btn btn-wave" type="submit" ng-if="editingTask">Update</button>
+											<button class="btn btn-danger" type="button" ng-click="resetSubtaskForm()">Cancel</button>
+										</form>
+										</div>
+										<div class="modal-footer">
+										<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+										</div>
+									</div>
+									
+									<ul class="expandable" ng-class="{ 'expanded': nestedSubTask.showHierarchy && hasSubTasks(nestedSubTask) }">
+										<li ng-repeat="nestedSubTask in nestedSubTask.subTask" ng-include="'subtaskTemplate.html'"></li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</td>
+				<td>{{project.status}}</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- Modal Structure -->
+	<div id="modal1" class="modal">
+		<div class="modal-content">
+		<h4>Add New</h4>
+		<form ng-submit="editingProject ? updateProject() : createProject()">
+			<label for="projectTitle">Project Title:</label>
+			<input type="text" id="projectTitle" ng-model="projectForm.title" placeholder="Enter project title">
+	
+			<label for="projectStatus">Project Status:</label>
+			<input type="text" id="projectStatus" ng-model="projectForm.status" placeholder="Enter project status">
+	
+			<button class="btn btn-wave" type="submit" ng-if="!editingProject">Create</button>
+			<button class="btn btn-wave" type="submit" ng-if="editingProject">Update</button>
+			<button class="btn btn-danger" type="button" ng-click="resetForm()">Cancel</button>
+		</form>
+		</div>
+		<div class="modal-footer">
+		<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+		</div>
+	</div>
+
+	<script type="text/ng-template" id="subtaskTemplate.html">
+		<button class="toggle-button" ng-if="hasSubTasks(nestedSubTask)" ng-click="toggleHierarchy(nestedSubTask)">
+			{{nestedSubTask.showHierarchy ? '-' : '+'}}
+		</button>
+		{{nestedSubTask.title}}
+		<ul class="expandable" ng-class="{ 'expanded': nestedSubTask.showHierarchy && hasSubTasks(nestedSubTask) }">
+			<li   ng-repeat="nestedSubTask in nestedSubTask.subTask" ng-include="'subtaskTemplate.html'"></li>
+		</ul>
+	</script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var elems = document.querySelectorAll('.modal');
+			var options = {dismissible: false}
+			var instances = M.Modal.init(elems, options);
+		});
+
+		document.addEventListener('DOMContentLoaded', function() {
+			var elems = document.querySelectorAll('.dropdown-trigger');
+			var options = {closeOnClick: true, coverTrigger: false, constrainWidth: false}
+			var instances = M.Dropdown.init(elems, options);
+		});
+
+	</script>
+
+	<script>
+		const app = angular.module('myApp', []);
+		app.controller('cont', function ($scope) {
+			$scope.name = "Project Management App";
+			$scope.editingProject = false;
+			$scope.editingTasK = false;
+			$scope.projectForm = {};
+			$scope.taskForm = {};
+
+			
+
+			var tasks_obj = [
+				{id: window.Math.random().toString(36).substring(2), title: "Go to market", status: "pending"},
+				{id: window.Math.random().toString(36).substring(2), title: "Go to hospital", status: "ongoing"}
+			];
+
+			var task1 = tasks_obj[0];
+
+			task1.subTask = [
+				{id: window.Math.random().toString(36).substring(2), title: "task one subtask 1 which is get pepper"},
+				{id: window.Math.random().toString(36).substring(2), title: "task one subtask 2 which is get Elubo"}
+			];
+
+			task1_subTask1 = task1.subTask[0];
+
+			task1_subTask1.subTask = [
+				{id: window.Math.random().toString(36).substring(2), title: "buy the pepper"},
+				{
+					id: window.Math.random().toString(36).substring(2), 
+					title: "clean the pepper",
+					subTask: [
+						{id: window.Math.random().toString(36).substring(2), title: "get water"},
+						{id: window.Math.random().toString(36).substring(2), title: "get the bucket"}
+					]
+				},
+				{id: window.Math.random().toString(36).substring(2), title: "grind the pepper"}
+			];
+
+			task1_subTask2 = task1.subTask[1];
+
+			task1_subTask2.subTask = [
+				{id: window.Math.random().toString(36).substring(2), title: "buy the elubo"},
+				{id: window.Math.random().toString(36).substring(2),	title: "clean the elubo"},
+				{id: window.Math.random().toString(36).substring(2), title: "grind the elubo"},
+				{id: window.Math.random().toString(36).substring(2), title: "sieve the elubo"}
+			];
+
+			$scope.projects = tasks_obj;
+			
+			console.log($scope.projects);
+
+			$scope.hasSubTasks = function (task) {
+				return task.subTask && task.subTask.length > 0;
+			};
+
+			$scope.toggleHierarchy = function (item) {
+				item.showHierarchy = !item.showHierarchy;
+			};
+
+			$scope.addSubtask = function (parentItem) {
+				console.log(parentItem)
+				parentItem.subTask = parentItem.subTask || [];
+				parentItem.subTask.push({
+					id: window.Math.random().toString(36).substring(2),
+					title: $scope.taskForm.title,
+					subTask: [],
+					showHierarchy: false
+				});
+				$scope.resetSubtask
+
+			Form();
+			};
+
+			$scope.editProject = function (project) {
+				$scope.editingProject = true;
+				$scope.projectForm = {
+					id: project.id,
+					title: project.title,
+					status: project.status
+				};
+			};
+
+			$scope.editTask = function (task) {
+				$scope.editingTask = true;
+				$scope.taskForm = {
+					id: task.id,
+					title: task.title,
+					status: task.status
+				};
+			};
+
+			$scope.updateProject = function () {
+				var projectIndex = $scope.projects.findIndex(function (project) {
+					return project.id === $scope.projectForm.id;
+				});
+
+				if (projectIndex > -1) {
+					$scope.projects[projectIndex].title = $scope.projectForm.title;
+					$scope.projects[projectIndex].status = $scope.projectForm.status;
+					$scope.resetForm();
+				}
+			};
+
+			$scope.createProject = function () {
+				$scope.projects.push({
+					id: window.Math.random().toString(36).substring(2),
+					title: $scope.projectForm.title,
+					status: $scope.projectForm.status,
+					subTask: [],
+					showHierarchy: false
+				});
+				$scope.resetForm();
+			};
+
+			$scope.createSubtask = function (id) {
+				const item = findObjectById($scope.projects, id);
+				console.log(item)
+				
+				if(item.subTask == undefined){
+					item.subTask = [
+						{
+							id: window.Math.random().toString(36).substring(2),
+							title: $scope.taskForm.title,
+							status: $scope.taskForm.status,
+						}
+					]
+				}else{
+					item.subTask.push(
+						{
+							id: window.Math.random().toString(36).substring(2),
+							title: $scope.taskForm.title,
+							status: $scope.taskForm.status,
+						}
+					);
+				}
+
+				$scope.resetSubtaskForm();
+
+				
+				var elems = document.querySelectorAll('.dropdown-trigger');
+				var options = {closeOnClick: true, coverTrigger: false, constrainWidth: false}
+				var instances = M.Dropdown.init(elems, options);
+				
+			};
+
+			$scope.deleteProject = function (project) {
+				var projectIndex = $scope.projects.findIndex(function (item) {
+					return item.id === project.id;
+				});
+
+				if (projectIndex > -1) {
+					$scope.projects.splice(projectIndex, 1);
+				}
+			};
+
+			$scope.resetForm = function () {
+				$scope.editingProject = false;
+				$scope.projectForm = {};
+			};
+
+			$scope.resetSubtaskForm = function () {
+				$scope.taskForm = {};
+				$scope.editingTask = false;
+			};
+		});
+	</script>
+
+	<!-- Object extractor by ID helper -->
+	<script>
+		function findObjectById(project, objectId) {
+			// Iterate through the array of objects in the project
+			for (let i = 0; i < project.length; i++) {
+				const obj = project[i];
+
+				// Check if the object's ID matches the desired ID
+				if (obj.id === objectId) {
+				return obj; // Return the matching object
+				}
+
+				// If the object has subtasks, recursively search for the ID within the subtasks
+				if (obj.subTask && obj.subTask.length > 0) {
+				const subTaskResult = findObjectById(obj.subTask, objectId);
+				if (subTaskResult) {
+					return subTaskResult; // Return the matching subtask object
+				}
+				}
+
+				// If the object has additional properties, recursively search for the ID within those properties
+				for (const prop in obj) {
+				if (obj[prop] && typeof obj[prop] === "object") {
+					const nestedResult = findObjectById([obj[prop]], objectId);
+					if (nestedResult) {
+					return nestedResult; // Return the matching nested object
+					}
+				}
+				}
+			}
+
+			return null; // Return null if no object with the specified ID is found
+		}
+
+		// // Example usage (same project object as before)
+		// const objectId = "7vxtmt7owts";
+		// const foundObject = findObjectById(project, objectId);
+		// console.log(foundObject);
+
+	</script>
+</body>
+</html>

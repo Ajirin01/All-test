@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint app</title>
+    <style>
+        .paint-container{
+            background-color: white;
+            width: 500px;
+            height: 500px;
+            border: 2px black solid
+        }
+    </style>
+</head>
+<body>
+    <canvas class="paint-container" id="paint-container">
+
+    </canvas>
+
+    <input type="color" name="" id="color">
+    
+    <script>
+        console.log('paint app')
+        
+        const paintContainer = document.getElementById('paint-container')
+        var down = false
+        const color = document.getElementById('color')
+    
+        const ctx = paintContainer.getContext('2d')
+
+
+        paintContainer.onmousedown = function(e){
+            console.log("mouse is down")
+            down = true
+
+            
+
+            ctx.strokeStyle = color.value
+            
+            let rect = e.currentTarget.getBoundingClientRect()
+            let x = e.clientX - rect.left
+            let y = e.clientY - rect.top
+            console.log('(',x, y,')')
+
+            ctx.moveTo(x,y)
+        }
+
+        paintContainer.onmouseup = function(){
+            console.log("mouse is up")
+            down = false
+        }
+
+        paintContainer.onmousemove = function(e){
+            if(down){
+                console.log("mouse is move")
+                let rect = e.currentTarget.getBoundingClientRect()
+                let x = e.clientX - rect.left
+                let y = e.clientY - rect.top
+                console.log('(',x, y,')')
+                
+                ctx.lineWidth = 10
+                ctx.lineTo(x,y)
+                ctx.stroke()
+            }
+            
+        }
+    </script>
+</body>
+</html>

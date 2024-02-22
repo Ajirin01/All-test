@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test array query</title>
+</head>
+<body>
+    
+    <script src="qeury-object.js"></script>
+    <script src="exam-papers.js"></script>
+    <script>
+        const arrayQuery = new ArrayQuery(exam_papers)
+
+        const fields = {
+            subject_id:  2,
+            exam_id:  1,
+            classes_id:  2
+        }
+
+        console.log(arrayQuery.selectWhere(fields))
+
+    </script>
+</body>
+</html>
